@@ -21,13 +21,14 @@ Dette projekt har til formål at overvåge vandstanden i en 1.000 liters vandtan
      * 50% - 15%: Gul
      * Under 15%: Rød
    - LED-lysstyrken justeres proportionalt med vandstanden inden for hvert farveinterval.
+   - Når tanken er tom (0%), blinker den nederste LED rødt.
 
 3. **MQTT-integration**:
    - Vandstandsdata sendes som procentdel via MQTT hvert 10. minut.
    - MQTT-emnet kunne være: "vandtank/niveau"
 
 4. **Strømstyring**:
-   - Implementer deep sleep-tilstand mellem målinger for at spare strøm.
+   - Optimerer strømforbruget mellem målinger.
 
 ## Implementeringsdetaljer
 1. **Setup**:
@@ -35,12 +36,12 @@ Dette projekt har til formål at overvåge vandstanden i en 1.000 liters vandtan
    - Initialiser ultralydssensor og RGB LED-strip.
 
 2. **Hovedloop**:
-   - Vågn fra deep sleep hvert 10. minut.
-   - Mål vandstanden med ultralydssensoren.
+   - Mål vandstanden med ultralydssensoren hvert 10. minut.
    - Beregn vandstandsprocenten.
    - Opdater RGB LED-strip baseret på vandstandsprocenten.
+   - Hvis tanken er tom (0%), få den nederste LED til at blinke rødt.
    - Send data via MQTT.
-   - Gå i deep sleep-tilstand.
+   - Vent til næste måling.
 
 3. **Kalibrering**:
    - Implementer en kalibreringsrutine for at måle tankens fulde højde.
