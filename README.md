@@ -7,8 +7,9 @@ Dette projekt implementerer et system til at overvåge vandstanden i en 1.000 li
 1. **Niveaumåling**: Måler vandstanden hvert 10. minut ved hjælp af en ultralydssensor.
 2. **Visuel indikation**: Viser vandstanden på en RGB LED-strip med farvekodning og variabel lysstyrke.
 3. **MQTT-integration**: Sender vandstandsdata som procentdel via MQTT.
-4. **Kalibrering**: Inkluderer en kalibreringsrutine for at måle tankens fulde højde.
+4. **Kalibrering**: Inkluderer en kalibreringsrutine for at måle tankens effektive højde.
 5. **Fejlhåndtering**: Implementerer fejlkontrol for sensormålinger og netværksforbindelse.
+6. **Fuld tank detektion**: Systemet betragter tanken som fuld, når sensoren måler 10 cm afstand.
 
 ## Hardware
 
@@ -37,7 +38,7 @@ Dette projekt implementerer et system til at overvåge vandstanden i en 1.000 li
 
 ## Kalibrering
 
-Ved første opstart vil systemet automatisk gå i kalibreringstilstand. Sørg for, at tanken er tom under kalibreringen. Systemet vil tage flere målinger for at bestemme tankens fulde højde.
+Ved første opstart vil systemet automatisk gå i kalibreringstilstand. Sørg for, at tanken er tom under kalibreringen. Systemet vil tage flere målinger for at bestemme tankens effektive højde. Tanken betragtes som fuld, når sensoren måler 10 cm afstand fra vandoverfladen.
 
 ## Brug
 
