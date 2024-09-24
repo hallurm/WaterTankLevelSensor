@@ -1,0 +1,103 @@
+# Water Tank Level Sensor ESPHome Configuration
+
+# Basic ESPHome Settings
+esphome:
+  name: water_tank_sensor
+  platform: ESP8266
+  board: d1_mini_lite
+
+# WiFi Connection
+wifi:
+  ssid: "YOUR_WIFI_SSID"
+  password: "YOUR_WIFI_PASSWORD"
+
+  # Enable fallback hotspot in case of connection failure
+  ap:
+    ssid: "Water Tank Sensor Fallback Hotspot"
+    password: "YOUR_FALLBACK_PASSWORD"
+
+# Enable Home Assistant API
+api:
+
+# Enable OTA updates
+ota:
+
+# Enable logging
+logger:
+
+# Ultrasonic Sensor Configuration
+sensor:
+  - platform: ultrasonic
+    trigger_pin: D1
+    echo_pin: D2
+    name: "Water Tank Level"
+    update_interval: 10min
+    filters:
+      - lambda: |-
+          if (x > 300) return {}; // Invalid reading
+          float tank_height = 100; // Adjust this to your tank's height in cm
+          float full_tank_height = 10; // Tank is full when sensor measures 10 cm
+          float water_level = tank_height - (x - full_tank_height);
+          float percentage = (water_level / tank_height) * 100;
+          return percentage > 100 ? 100 : percentage < 0 ? 0 : percentage;
+    unit_of_measurement: "%"
+    accuracy_decimals: 1
+
+# NeoPixel LED Strip Configuration
+light:
+  - platform: neopixelbus
+    type: GRB
+    pin: D4
+    num_leds: 60
+    name: "Water Tank LED Strip"
+    effects:
+      - addressable_lambda:
+          name: "Water Level Indicator"
+          update_interval: 1s
+          lambda: |-
+            float level = id(water_tank_level).state;
+            int leds_to_light = (level / 100.0) * it.size();
+            for (int i = 0; i < it.size(); i++) {
+              if (i < leds_to_light) {
+                if (level > 50) {
+                  it[i] = Color(0, 255, 0); // Green
+                } else if (level > 15) {
+                  it[i] = Color(255, 255, 0); // Yellow
+                } else {
+                  it[i] = Color(255, 0, 0); // Red
+                }
+              } else {
+                it[i] = Color(0, 0, 0); // Off
+              }
+            }
+            // Blink bottom LED if tank is empty
+            if (level == 0) {
+              if (millis() % 1000 < 500) {
+                it[0] = Color(255, 0, 0);
+              } else {
+                it[0] = Color(0, 0, 0);
+              }
+            }
+
+# Calibration Button
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D3
+      mode: INPUT_PULLUP
+    name: "Calibration Button"
+    on_press:
+      then:
+        - logger.log: "Starting tank calibration..."
+        - delay: 2s
+        - lambda: |-
+            float sum = 0;
+            for (int i = 0; i < 5; i++) {
+              sum += id(water_tank_level).state;
+              delay(1000);
+            }
+            float empty_tank_distance = sum / 5;
+            float tank_height = empty_tank_distance - 10; // 10 cm is full tank height
+            ESP_LOGD("Calibration", "Empty distance: %.2f cm, Tank height: %.2f cm", empty_tank_distance, tank_height);
+            // Here you would typically store tank_height in flash memory
+        - logger.log: "Calibration complete"
