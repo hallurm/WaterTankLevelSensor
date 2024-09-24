@@ -34,6 +34,7 @@ PubSubClient client(espClient);
 // Variables
 unsigned long lastMeasurementTime = 0;
 const unsigned long measurementInterval = 600000; // 10 minutes in milliseconds
+const int FULL_TANK_HEIGHT = 10; // Tank is full when sensor measures 10 cm
 int tankHeight = 0; // Will be set during calibration
 float waterLevel = 0;
 bool isCalibrated = false;
@@ -124,31 +125,35 @@ void reconnectMQTT() {
 }
 
 void calibrateTank() {
-  Serial.println("Calibrating tank height...");
+  Serial.println("Calibrating tank...");
   delay(2000);
   int measurements[5];
   for (int i = 0; i < 5; i++) {
     measurements[i] = sonar.ping_cm();
     delay(1000);
   }
-  tankHeight = 0;
+  int emptyTankDistance = 0;
   for (int i = 0; i < 5; i++) {
-    tankHeight += measurements[i];
+    emptyTankDistance += measurements[i];
   }
-  tankHeight /= 5;
+  emptyTankDistance /= 5;
+  
+  tankHeight = emptyTankDistance - FULL_TANK_HEIGHT;
   
   EEPROM.put(0, true);
   EEPROM.put(4, tankHeight);
   EEPROM.commit();
   
-  Serial.print("Tank height calibrated to: ");
+  Serial.print("Tank calibrated. Empty distance: ");
+  Serial.print(emptyTankDistance);
+  Serial.print(" cm, Effective tank height: ");
   Serial.print(tankHeight);
   Serial.println(" cm");
 }
 
 float measureWaterLevel() {
   int distance = sonar.ping_cm();
-  waterLevel = tankHeight - distance;
+  waterLevel = tankHeight - (distance - FULL_TANK_HEIGHT);
   float percentage = (waterLevel / tankHeight) * 100;
   percentage = constrain(percentage, 0, 100);
   return percentage;
