@@ -32,7 +32,7 @@ Dette projekt implementerer et system til at overvåge vandstanden i en 1.000 li
    - Ultralydssensor: TRIGGER_PIN til D1, ECHO_PIN til D2
    - LED-strip: DATA_PIN til D4
 2. Installer de nødvendige biblioteker via PlatformIO eller Arduino IDE.
-3. Opdater WiFi-legitimationsoplysninger og MQTT-broker indstillinger i koden.
+3. Opdater WiFi-legitimationsoplysninger, MQTT-broker indstillinger, samt MQTT-brugernavn og adgangskode i koden.
 4. Upload koden til din ESP8266.
 
 ## Kalibrering
@@ -68,6 +68,7 @@ LED-farvekodning:
 
 - Sørg for, at al elektronik er ordentligt isoleret og vandtæt.
 - Implementer sikker MQTT-kommunikation med kryptering og autentificering i produktionsmiljøer.
+- Brug sikre metoder til at gemme MQTT-brugernavne og adgangskoder, såsom en separat konfigurationsfil eller sikker lagerløsning.
 - Overvej at tilføje en fysisk reset-knap for nem genkalibrering eller fejlretning.
 
 ## Bidrag
