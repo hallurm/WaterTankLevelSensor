@@ -13,6 +13,8 @@ const char* password = "YOUR_PASSWORD";
 const char* mqtt_server = "YOUR_MQTT_BROKER";
 const int mqtt_port = 1883;
 const char* mqtt_topic = "vandtank/niveau";
+const char* mqtt_username = "YOUR_MQTT_USERNAME";
+const char* mqtt_password = "YOUR_MQTT_PASSWORD";
 
 // Ultrasonic sensor pins
 #define TRIGGER_PIN  D1
@@ -110,7 +112,7 @@ void setupWiFi() {
 void reconnectMQTT() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
-    if (client.connect("ESP8266Client")) {
+    if (client.connect("ESP8266Client", mqtt_username, mqtt_password)) {
       Serial.println("connected");
     } else {
       Serial.print("failed, rc=");
